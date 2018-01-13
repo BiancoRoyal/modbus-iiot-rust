@@ -1,0 +1,7 @@
+[package]
+name = "modbus-iiot"
+version = "0.1.0"
+authors = ["Klaus Landsdorf <klaus.landsdorf@bianco-royal.de>"]
+repository = "https://github.com/biancode/modbus-iiot-rust.git"
+license = "MPL-2.0"
+keywords = ["modbus", "hardware", "iiot", "iot", "opcua"]
