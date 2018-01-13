@@ -193,7 +193,7 @@ impl ModbusReturnRegisters
     
 }
 
-
+#[repr(C)]
 pub struct ReturnBad
 {
 

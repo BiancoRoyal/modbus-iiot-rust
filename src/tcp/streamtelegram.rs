@@ -5,9 +5,6 @@ use std::net::TcpStream;
 use core::modbustelegram::ModbusTelegram;
 
 
-const MODBUS_HEADER_SIZE : u16 = 0x0007;
-
-
 //	===============================================================================================
 
 
@@ -23,11 +20,6 @@ fn read_telegram_from_stream ( stream : &mut TcpStream, expected_bytes : u8 ) ->
 	//	Auswertung des Response in Funktion auslagern
 	if l_io_response.is_ok()
 	{
-		//	start debug ausgabe
-		println! ( "=> read_telegram_from_stream" );
-		print_array_of_u8 ( &l_data );
-		//	ende debug ausgabe
-
 		let l_telegram : Option<ModbusTelegram> = ModbusTelegram::new_from_bytes ( &l_data );
 
         if l_telegram.is_some ( )
@@ -54,11 +46,6 @@ fn write_telegram_to_stream ( stream : &mut TcpStream, telegram : &ModbusTelegra
 	if l_bytes.is_some ( )
 	{
 		l_data = l_bytes.unwrap ( );
-
-		//	start debug ausgabe
-		println! ( "=> write_telegram_to_stream" );
-		print_array_of_u8 ( &l_data );
-		//	ende debug ausgabe
 
 		let l_response = stream.write_all ( &l_data );
 
@@ -111,17 +98,4 @@ pub fn process_modbus_telegram ( stream : &mut TcpStream, l_telegram_option : &m
 	}
 	
 	return l_return;
-}
-
-
-fn print_array_of_u8 ( array : &Vec<u8> )
-{
-	print!("size of byte-array {} => ", array.len ( ) );
-
-	for byte in array
-	{		
-		print! ( "{}, ", byte );		
-	}
-
-	println! ( );
 }
