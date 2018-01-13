@@ -14,7 +14,6 @@ pub fn create_tcp_stream_v4 ( host : &str, port : u16 ) -> Option < TcpStream >
 	
 	if l_address.is_some ( )
 	{
-		//	Fehlerbehandlung und auslagern in eigene Funktion
 		let ip : Ipv4Addr = l_address.unwrap ( );
 		
 		let socket : SocketAddrV4 = SocketAddrV4::new ( ip, port );

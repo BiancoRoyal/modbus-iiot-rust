@@ -260,8 +260,6 @@ impl ReturnBad
 }
 
 
-//  @TODO - return überarbeiten
-//  + _ = exception_code in "Unknown Exception Code" hineinformatieren
 fn get_message_of_exception_code ( code : u8 ) -> Option<String>
 {
     let l_return : Option<String>;

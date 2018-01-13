@@ -14,8 +14,6 @@ const FUNCTION_CODE_WRITE_SINGLE_REGISTER : u8 = 0x06;
 
 const MODBUS_HEADER_SIZE : u8 = 0x07;
 
-//	in BETA-Version aufteilen in eine Datei pro Function-Code
-
 //	===============================================================================================
 
 #[test]
@@ -36,14 +34,12 @@ fn test_create_request_read_coils ( )
 
 	let l_telegram : ModbusTelegram = l_result_1_data.unwrap ( );
 	
-	//	den FunctionCode von ModbusTelegrams testen
 	let l_function_code: Option<u8> = l_telegram.get_function_code ( );
 	
 	assert_eq! ( l_function_code.is_some ( ), true );
 	assert_eq! ( l_function_code.unwrap ( ), FUNCTION_CODE_READ_COILS );
 
 	
-	//	alle bytes von ModbusTelegram testen
 	let l_telegram_bytes : Option<Vec<u8>> = l_telegram.get_bytes ( );
 
 	assert_eq! ( l_telegram_bytes.is_some ( ), true );
@@ -115,13 +111,11 @@ fn test_create_request_read_discrete_inputs ( )
 
 	let l_telegram : ModbusTelegram = l_result_1_data.unwrap ( );
 	
-	//	den FunctionCode von ModbusTelegrams testen
 	let l_function_code: Option<u8> = l_telegram.get_function_code ( );
 	
 	assert_eq! ( l_function_code.is_some ( ), true );
 	assert_eq! ( l_function_code.unwrap ( ), FUNCTION_CODE_READ_DISCRETE_INPUTS );
 
-	//	alle bytes von ModbusTelegram testen
 	let l_telegram_bytes : Option<Vec<u8>> = l_telegram.get_bytes ( );
 
 	assert_eq! ( l_telegram_bytes.is_some ( ), true );
@@ -192,13 +186,11 @@ fn test_create_request_read_holding_registers ( )
 
 	let l_telegram : ModbusTelegram = l_result_1_data.unwrap ( );
 	
-	//	den FunctionCode von ModbusTelegrams testen
 	let l_function_code: Option<u8> = l_telegram.get_function_code ( );
 	
 	assert_eq! ( l_function_code.is_some ( ), true );
 	assert_eq! ( l_function_code.unwrap ( ), FUNCTION_CODE_READ_HOLDING_REGISTERS );
 
-	//	alle bytes von ModbusTelegram testen
 	let l_telegram_bytes : Option<Vec<u8>> = l_telegram.get_bytes ( );
 
 	assert_eq! ( l_telegram_bytes.is_some ( ), true );
@@ -269,13 +261,11 @@ fn test_create_request_read_input_registers ( )
 
 	let l_telegram : ModbusTelegram = l_result_1_data.unwrap ( );
 	
-	//	den FunctionCode von ModbusTelegrams testen
 	let l_function_code: Option<u8> = l_telegram.get_function_code ( );
 	
 	assert_eq! ( l_function_code.is_some ( ), true );
 	assert_eq! ( l_function_code.unwrap ( ), FUNCTION_CODE_READ_INPUT_REGISTERS );
 
-	//	alle bytes von ModbusTelegram testen
 	let l_telegram_bytes : Option<Vec<u8>> = l_telegram.get_bytes ( );
 
 	assert_eq! ( l_telegram_bytes.is_some ( ), true );
@@ -353,13 +343,11 @@ fn test_create_request_write_multiple_coils ( )
 
 	let l_telegram : ModbusTelegram = l_result_1_data.unwrap ( );
 	
-	//	den FunctionCode von ModbusTelegrams testen
 	let l_function_code: Option<u8> = l_telegram.get_function_code ( );
 	
 	assert_eq! ( l_function_code.is_some ( ), true );
 	assert_eq! ( l_function_code.unwrap ( ), FUNCTION_CODE_WRITE_MULTIPLE_COILS );
 
-	//	alle bytes von ModbusTelegram testen
 	let l_telegram_bytes : Option<Vec<u8>> = l_telegram.get_bytes ( );
 
 	assert_eq! ( l_telegram_bytes.is_some ( ), true );
@@ -440,13 +428,11 @@ fn test_create_request_write_multiple_registers ( )
 
 	let l_telegram : ModbusTelegram = l_result_1_data.unwrap ( );
 	
-	//	den FunctionCode von ModbusTelegrams testen
 	let l_function_code: Option<u8> = l_telegram.get_function_code ( );
 	
 	assert_eq! ( l_function_code.is_some ( ), true );
 	assert_eq! ( l_function_code.unwrap ( ), FUNCTION_CODE_WRITE_MULTIPLE_REGISTERS );
 
-	//	alle bytes von ModbusTelegram testen
 	let l_telegram_bytes : Option<Vec<u8>> = l_telegram.get_bytes ( );
 
 	assert_eq! ( l_telegram_bytes.is_some ( ), true );
@@ -528,13 +514,11 @@ fn test_create_request_write_single_coil ( )
 
 	let l_telegram : ModbusTelegram = l_result_1_data.unwrap ( );
 	
-	//	den FunctionCode von ModbusTelegrams testen
 	let l_function_code: Option<u8> = l_telegram.get_function_code ( );
 	
 	assert_eq! ( l_function_code.is_some ( ), true );
 	assert_eq! ( l_function_code.unwrap ( ), FUNCTION_CODE_WRITE_SINGLE_COIL );
 	
-	//	alle bytes von ModbusTelegram testen
 	let l_telegram_bytes : Option<Vec<u8>> = l_telegram.get_bytes ( );
 
 	assert_eq! ( l_telegram_bytes.is_some ( ), true );
