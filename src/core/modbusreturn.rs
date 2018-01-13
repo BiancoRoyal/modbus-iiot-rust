@@ -1,5 +1,6 @@
 
 
+#[derive(Debug)]
 pub enum ModbusReturnCoils
 {
     Bad ( ReturnBad ),
@@ -97,6 +98,7 @@ impl ModbusReturnCoils
 }
 
 
+#[derive(Debug)]
 pub enum ModbusReturnRegisters
 {
     Bad ( ReturnBad ),
@@ -193,7 +195,8 @@ impl ModbusReturnRegisters
     
 }
 
-#[repr(C)]
+
+#[derive(Debug)]
 pub struct ReturnBad
 {
 
@@ -280,6 +283,7 @@ fn get_message_of_exception_code ( code : u8 ) -> Option<String>
 }
 
 
+#[derive(Debug)]
 pub struct ReturnGood<T>
 {
     data : Option<Vec<T>>,
