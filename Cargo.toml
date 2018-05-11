@@ -5,7 +5,7 @@ authors = ["Klaus Landsdorf <klaus.landsdorf@bianco-royal.de>"]
 repository = "https://github.com/biancode/modbus-iiot-rust.git"
 license = "MPL-2.0"
 description="A pure Rust library for working with Modbus in IoT/IIoT projects. It is based on the Modbus protocol specification with the focus on no or few dependencies."
-keywords = ["modbus", "hardware", "iiot", "iot", "opcua", "pure", "tcp", "industrial", "automation", "fieldbus"]
+keywords = ["modbus", "fieldbus", "iiot", "opcua", "automation"]
 homepage = "https://bianco-royal.cloud/"
 readme = "README.md"
 
