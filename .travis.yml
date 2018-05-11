@@ -3,8 +3,11 @@ language: rust
 matrix:
   include:
   - rust: stable
+  - rust: beta
   - rust: nightly
-
+  allow_failures:
+    - rust: nightly
+  fast_finish: true
 addons:
   apt:
     packages:
@@ -26,9 +29,13 @@ before_script:
       cargo install-update -a
 
 script:
-  - |
-      cargo build &&
-      cargo test
+  - cargo build --verbose --all
+  - cargo test --verbose --all
 
 after_success:
   - cargo coveralls
+
+branches:
+  only:
+  - master
+  - develop
