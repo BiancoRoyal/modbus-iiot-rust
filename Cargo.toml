@@ -1,11 +1,13 @@
 [package]
 name = "modbus-iiot"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Klaus Landsdorf <klaus.landsdorf@bianco-royal.de>"]
 repository = "https://github.com/biancode/modbus-iiot-rust.git"
 license = "MPL-2.0"
-description="A pure rust library to work with Modbus in IoT/IIoT projects. It is based on the Modbus protocol specification with less dependencies."
-keywords = ["modbus", "hardware", "iiot", "iot", "opcua", "pure", "tcp", "industrial"]
+description="A pure Rust library for working with Modbus in IoT/IIoT projects. It is based on the Modbus protocol specification with the focus on no or few dependencies."
+keywords = ["modbus", "hardware", "iiot", "iot", "opcua", "pure", "tcp", "industrial", "automation", "fieldbus"]
+homepage = "https://bianco-royal.cloud/"
+readme = "README.md"
 
 [badges]
 travis-ci = { repository = "BiancoRoyal/modbus-iiot-rust" }
