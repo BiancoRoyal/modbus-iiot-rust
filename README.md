@@ -1,3 +1,10 @@
+[![Crates.io version](https://img.shields.io/crates/v/modbus-iiot.svg)](https://crates.io/crates/modbus-iiot)
+[![Docs](https://docs.rs/modbus-iiot/badge.svg)](https://docs.rs/modbus-iiot/0.1.0/modbus_iiot/)
+[![Coverage](https://coveralls.io/repos/github/BiancoRoyal/modbus-iiot-rust/badge.svg?branch=master)](https://coveralls.io/github/BiancoRoyal/modbus-iiot-rust?branch=master)
+[![CI](https://travis-ci.org/BiancoRoyal/modbus-iiot-rust.svg?branch=master)](https://travis-ci.org/BiancoRoyal/modbus-iiot-rust/)
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/BiancoRoyal/modbus-iiot-rust.svg)](http://isitmaintained.com/project/BiancoRoyal/modbus-iiot-rust "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/BiancoRoyal/modbus-iiot-rust.svg)](http://isitmaintained.com/project/BiancoRoyal/modbus-iiot-rust "Percentage of issues still open")
+
 The Modbus IIoT Library
 ========================
 
