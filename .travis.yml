@@ -1,4 +1,3 @@
-sudo: required
 language: rust
 matrix:
   include:
@@ -8,33 +7,12 @@ matrix:
   allow_failures:
     - rust: nightly
   fast_finish: true
-addons:
-  apt:
-    packages:
-      - libudev-dev
-      - libcurl4-openssl-dev
-      - libelf-dev
-      - libdw-dev
-      - binutils-dev
-      - cmake
-    sources:
-      - kalakris-cmake
-
-# load travis-cargo
-before_script:
-  - |
-      export PATH=$HOME/.local/bin:$PATH
-      cargo install cargo-update || echo "cargo-update already installed" &&
-      cargo install cargo-travis || echo "cargo-travis already installed" &&
-      cargo install-update -a
-
+cache: cargo
 script:
   - cargo build --verbose --all
   - cargo test --verbose --all
-
 after_success:
   - cargo coveralls
-
 branches:
   only:
   - master
