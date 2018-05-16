@@ -1,5 +1,10 @@
 
 
+use std::fmt;
+
+//	===============================================================================================
+
+#[derive( Debug )]
 pub enum ModbusReturnCoils
 {
     Bad( ReturnBad ),
@@ -91,8 +96,82 @@ impl ModbusReturnCoils
     }    
 }
 
+impl fmt::Display for ModbusReturnCoils
+{
+    fn fmt ( &self, f: &mut fmt::Formatter ) -> fmt::Result
+    {
+        let state : &str;
+        
+        if self.is_none ()
+        {
+            state = "none";
+        } 
+        else
+        {
+            if self.is_good ()
+            {
+                state = "good";
+            }
+            else if self.is_bad ()
+            {
+                state = "bad";
+            }
+            else
+            {
+                state = "error";
+            }
+        }
+
+        return write! ( f, "{}", state );
+    }
+}
+
+#[test]
+fn test_modbus_return_coils_on_bad ()
+{
+    let result : ModbusReturnCoils = ModbusReturnCoils::Bad( ReturnBad::new_with_codes ( 0x01, 
+                                                                                         0x01 ) );
+    assert_eq! ( result.is_none (), false );
+    assert_eq! ( result.is_some (), true );
+    assert_eq! ( result.is_bad (), true );
+    assert_eq! ( result.is_good (), false );
+
+    let result_data : ReturnBad = result.unwrap_bad ();
+    assert_eq! ( result_data.get_error_code (), 0x01 ); 
+}
+
+#[test]
+fn test_modbus_return_coils_on_good ()
+{
+    let test_data : Vec< bool > = vec![ true, true, false, true, false, false, true, false ];
+
+    let result : ModbusReturnCoils = ModbusReturnCoils::Good( ReturnGood::new ( test_data,
+                                                                                250 ) );
+    assert_eq! ( result.is_none (), false );
+    assert_eq! ( result.is_some (), true );
+    assert_eq! ( result.is_bad (), false );
+    assert_eq! ( result.is_good (), true );
+
+    let mut result_good : ReturnGood< bool > = result.unwrap_good ();
+    assert_eq! ( result_good.get_duration_in_milliseconds (), 250 );
+    
+    let result_data : Vec< bool > = result_good.get_data ();
+    assert_eq! ( result_data.len (), 8 );
+}
+
+#[test]
+fn test_modbus_return_coils_on_none ()
+{
+    let result : ModbusReturnCoils = ModbusReturnCoils::None;
+    assert_eq! ( result.is_none (), true );
+    assert_eq! ( result.is_some (), false );
+    assert_eq! ( result.is_bad (), false );
+    assert_eq! ( result.is_good (), false );
+}
+
 //	===============================================================================================
 
+#[derive( Debug )]
 pub enum ModbusReturnRegisters
 {
     Bad( ReturnBad ),
@@ -184,8 +263,82 @@ impl ModbusReturnRegisters
     }    
 }
 
+impl fmt::Display for ModbusReturnRegisters
+{
+    fn fmt ( &self, f: &mut fmt::Formatter ) -> fmt::Result
+    {
+        let state : &str;
+        
+        if self.is_none ()
+        {
+            state = "none";
+        } 
+        else
+        {
+            if self.is_good ()
+            {
+                state = "good";
+            }
+            else if self.is_bad ()
+            {
+                state = "bad";
+            }
+            else
+            {
+                state = "error";
+            }
+        }
+
+        return write! ( f, "{}", state );
+    }
+}
+
+#[test]
+fn test_modbus_return_registers_on_bad ()
+{
+    let result : ModbusReturnRegisters = ModbusReturnRegisters::Bad( ReturnBad::new_with_codes ( 0x01, 
+                                                                                                 0x01 ) );
+    assert_eq! ( result.is_none (), false );
+    assert_eq! ( result.is_some (), true );
+    assert_eq! ( result.is_bad (), true );
+    assert_eq! ( result.is_good (), false );
+
+    let result_data : ReturnBad = result.unwrap_bad ();
+    assert_eq! ( result_data.get_error_code (), 0x01 ); 
+}
+
+#[test]
+fn test_modbus_return_registers_on_good ()
+{
+    let test_data : Vec< u16 > = vec![ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 ];
+
+    let result : ModbusReturnRegisters = ModbusReturnRegisters::Good( ReturnGood::new ( test_data,
+                                                                                        250 ) );
+    assert_eq! ( result.is_none (), false );
+    assert_eq! ( result.is_some (), true );
+    assert_eq! ( result.is_bad (), false );
+    assert_eq! ( result.is_good (), true );
+
+    let mut result_good : ReturnGood< u16 > = result.unwrap_good ();
+    assert_eq! ( result_good.get_duration_in_milliseconds (), 250 );
+    
+    let result_data : Vec< u16 > = result_good.get_data ();
+    assert_eq! ( result_data.len (), 8 );
+}
+
+#[test]
+fn test_modbus_return_registers_on_none ()
+{
+    let result : ModbusReturnRegisters = ModbusReturnRegisters::None;
+    assert_eq! ( result.is_none (), true );
+    assert_eq! ( result.is_some (), false );
+    assert_eq! ( result.is_bad (), false );
+    assert_eq! ( result.is_good (), false );
+}
+
 //	===============================================================================================
 
+#[derive( Debug )] 
 pub struct ReturnBad
 {
     error_code : Option< u8 >,
@@ -256,7 +409,43 @@ impl ReturnBad
     }
 }
 
+#[test]
+fn test_return_bad_by_new_with_codes ()
+{
+    let result : ReturnBad = ReturnBad::new_with_codes ( 0x01, 
+                                                         0x01 );
+    assert_eq! ( result.get_error_code (), 0x01 );
+    assert_eq! ( result.get_exception_code (), 0x01 );
+    assert! ( result.get_message ().len () > 0 );
+}
+
+#[test]
+fn test_return_bad_by_new_with_message ()
+{
+    let message : &str = "test message";
+    let result : ReturnBad = ReturnBad::new_with_message ( message );
+    assert_eq! ( result.get_error_code (), 0x00 );
+    assert_eq! ( result.get_exception_code (), 0x00 );
+    assert_eq! ( result.get_message (), message );
+}
+
 //	===============================================================================================
+
+#[test]
+fn test_get_message_of_exception_code ()
+{
+    let result_1 : Option< String > = get_message_of_exception_code ( 0x01 );
+    assert! ( result_1.is_some () );
+
+    let result_2 : Option< String > = get_message_of_exception_code ( 0x02 );
+    assert! ( result_2.is_some () );
+
+    let result_3 : Option< String > = get_message_of_exception_code ( 0x03 );
+    assert! ( result_3.is_some () );
+
+    let result_4 : Option< String > = get_message_of_exception_code ( 0x04 );
+    assert! ( result_4.is_some () );
+}
 
 fn get_message_of_exception_code ( code : u8 ) -> Option< String >
 {
@@ -279,6 +468,7 @@ fn get_message_of_exception_code ( code : u8 ) -> Option< String >
 
 //	===============================================================================================
 
+#[derive( Debug )] 
 pub struct ReturnGood< T >
 {
     data : Option< Vec< T > >,
@@ -314,13 +504,13 @@ impl< T > ReturnGood< T >
         return reply;
     }
 
-    pub fn get_duration_in_milliseconds ( &mut self ) -> u64
+    pub fn get_duration_in_milliseconds ( &self ) -> u64
     {
         let reply : u64;
 
         if self.duration_in_milliseconds.is_some ()
         {
-            reply = self.duration_in_milliseconds.take ().unwrap ();
+            reply = *self.duration_in_milliseconds.as_ref ().unwrap ();
         }
         else
         {
@@ -329,4 +519,19 @@ impl< T > ReturnGood< T >
 
         return reply;
     }    
+}
+
+#[test]
+fn test_return_good ()
+{
+    let test_data : Vec< u16 > = vec![ 0xFF00, 0x00FF ];
+
+    let mut result : ReturnGood< u16 > = ReturnGood::new ( test_data,
+                                                           4 );
+    assert_eq! ( result.get_duration_in_milliseconds (), 4 );
+    
+    let result_data : Vec< u16 > = result.get_data ();
+    assert_eq! ( result_data.len (), 2 );
+    assert_eq! ( result_data[ 0 ], 0xFF00 );
+    assert_eq! ( result_data[ 1 ], 0x00FF );
 }
