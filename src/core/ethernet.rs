@@ -2,6 +2,7 @@
 
 use core::modbusreturn::{ModbusReturnCoils, ModbusReturnRegisters};
 
+//	===============================================================================================
 
 pub trait EthernetMaster
 {	
