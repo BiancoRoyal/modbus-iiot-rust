@@ -3,7 +3,7 @@
 use std::net::{TcpStream, Shutdown};
 use std::result::Result;
 use std::time::{Duration, SystemTime};
-use network::common::create_tcp_stream_v4;
+use network::common::create_tcp_stream;
 use core::ethernet::*;
 use core::modbustelegram::*;
 use core::modbusreturn::{ModbusReturnCoils, ModbusReturnRegisters, ReturnBad, ReturnGood};
@@ -56,58 +56,47 @@ impl TcpClient
 			};
 	}
 
-	pub fn connect ( &mut self )
+	pub fn connect ( &mut self ) -> bool
 	{
-		//	evtl. Zustand oder Fehler ausgeben mit Rückgabe von Option < bool >
+		let reply : bool;
 
-		let l_connection : Option < TcpStream > = 
-			create_tcp_stream_v4 ( &self.address, self.port );
-		
-		if l_connection.is_some ( )
+		if let Some( connection ) = create_tcp_stream ( &self.address, 
+														self.port )
 		{
-			let l_stream : TcpStream =
-				l_connection.unwrap ( );
-			
-			let l_timeout : Duration =
-				Duration::from_millis ( 500 );
+			let timeout : Duration = Duration::from_millis ( 500 );
 
-			let _ = l_stream.set_read_timeout ( Some ( l_timeout ) );
+			let _ = connection.set_read_timeout ( Some( timeout ) );
+			let _ = connection.set_write_timeout ( Some( timeout ) );
+			let _ = connection.set_nodelay ( true );
 
-			let _ = l_stream.set_write_timeout ( Some ( l_timeout ) );
-			
-			let _ = l_stream.set_nodelay ( true );
+			self.stream = Some( connection );
 
-			self.stream = Some ( l_stream );
-
-			println! ( "debug - fn connect => is open" );
+			reply = true;
+		}
+		else
+		{
+			reply = false;
 		}
 
+		return reply;
 	}
 
-	pub fn disconnect ( &mut self )
-	{
-		
-		if self.stream.is_some ( )
-		{
-			//	Option < TcpStream > nach network::common auslagern
-			let l_stream : Option < TcpStream > = self.stream.take ( );
-			
-			let l_tcp : TcpStream = l_stream.unwrap ( );
-			
-			let l_result = l_tcp.shutdown ( Shutdown::Both );
-						
-			//	DEBUG-Info
-			if l_result.is_ok ( )
-			{
-				println! ( "debug - fn disconnect => is closed" );
-			}
-			else
-			{
-				println! ( "debug - fn disconnect => has error" );
-			}
+	pub fn disconnect ( &mut self ) -> bool
+	{	
+		let mut reply : bool = false;	
 
+		if self.stream.is_some ()
+		{			
+			if let Some( connection ) = self.stream.take ()
+			{
+				if let Ok( _ ) = connection.shutdown ( Shutdown:: Both )
+				{
+					reply = true;
+				}				
+			}
 		}
-		
+
+		return reply;
 	}
 
 	pub fn update_last_transaction_id ( &mut self )
