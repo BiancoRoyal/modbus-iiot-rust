@@ -1,6 +1,6 @@
 [package]
 name = "modbus-iiot"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Klaus Landsdorf <klaus.landsdorf@bianco-royal.de>"]
 repository = "https://github.com/BiancoRoyal/modbus-iiot-rust"
 license = "MPL-2.0"
