@@ -1,10 +1,10 @@
 
 
-use std::fmt;
+use std::fmt; 
+ 
+//  ===============================================================================================
 
-//	===============================================================================================
-
-#[derive( Debug )]
+#[derive( Debug )] 
 pub enum ModbusReturnCoils
 {
     Bad( ReturnBad ),
@@ -96,36 +96,6 @@ impl ModbusReturnCoils
     }    
 }
 
-impl fmt::Display for ModbusReturnCoils
-{
-    fn fmt ( &self, f: &mut fmt::Formatter ) -> fmt::Result
-    {
-        let state : &str;
-        
-        if self.is_none ()
-        {
-            state = "none";
-        } 
-        else
-        {
-            if self.is_good ()
-            {
-                state = "good";
-            }
-            else if self.is_bad ()
-            {
-                state = "bad";
-            }
-            else
-            {
-                state = "error";
-            }
-        }
-
-        return write! ( f, "{}", state );
-    }
-}
-
 #[test]
 fn test_modbus_return_coils_on_bad ()
 {
@@ -171,7 +141,39 @@ fn test_modbus_return_coils_on_none ()
 
 //	===============================================================================================
 
-#[derive( Debug )]
+impl fmt::Display for ModbusReturnCoils 
+{ 
+    fn fmt ( &self, f: &mut fmt::Formatter ) -> fmt::Result 
+    { 
+        let state : &str; 
+         
+        if self.is_none () 
+        { 
+            state = "none"; 
+        }  
+        else 
+        { 
+            if self.is_good () 
+            { 
+                state = "good"; 
+            } 
+            else if self.is_bad () 
+            { 
+                state = "bad"; 
+            } 
+            else 
+            { 
+                state = "error"; 
+            } 
+        } 
+ 
+        return write! ( f, "{}", state ); 
+    } 
+} 
+
+//	===============================================================================================
+
+#[derive( Debug )] 
 pub enum ModbusReturnRegisters
 {
     Bad( ReturnBad ),
@@ -263,36 +265,6 @@ impl ModbusReturnRegisters
     }    
 }
 
-impl fmt::Display for ModbusReturnRegisters
-{
-    fn fmt ( &self, f: &mut fmt::Formatter ) -> fmt::Result
-    {
-        let state : &str;
-        
-        if self.is_none ()
-        {
-            state = "none";
-        } 
-        else
-        {
-            if self.is_good ()
-            {
-                state = "good";
-            }
-            else if self.is_bad ()
-            {
-                state = "bad";
-            }
-            else
-            {
-                state = "error";
-            }
-        }
-
-        return write! ( f, "{}", state );
-    }
-}
-
 #[test]
 fn test_modbus_return_registers_on_bad ()
 {
@@ -335,6 +307,38 @@ fn test_modbus_return_registers_on_none ()
     assert_eq! ( result.is_bad (), false );
     assert_eq! ( result.is_good (), false );
 }
+
+//	===============================================================================================
+
+impl fmt::Display for ModbusReturnRegisters 
+{ 
+    fn fmt ( &self, f: &mut fmt::Formatter ) -> fmt::Result 
+    { 
+        let state : &str; 
+         
+        if self.is_none () 
+        { 
+            state = "none"; 
+        }  
+        else 
+        { 
+            if self.is_good () 
+            { 
+                state = "good"; 
+            } 
+            else if self.is_bad () 
+            { 
+                state = "bad"; 
+            } 
+            else 
+            { 
+                state = "error"; 
+            } 
+        } 
+ 
+        return write! ( f, "{}", state ); 
+    } 
+} 
 
 //	===============================================================================================
 
