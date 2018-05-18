@@ -1363,13 +1363,13 @@ pub fn prepare_response_write_single_register ( payload : &Vec< u8 > ) -> Vec< u
 fn test_is_payload_read_length_valid ()
 {
 	let test_read_data : Vec< u8 > = vec![ 0x03, 0xAC, 0xDB, 0x35 ];
-	assert!(is_payload_read_length_valid(&test_read_data));
+	assert!( is_payload_read_length_valid ( &test_read_data ) );
 
 	let test_read_data : Vec< u8 > = vec![ 0x03, 0xAC ];
-	assert_eq!(is_payload_read_length_valid(&test_read_data), false);
+	assert_eq!( is_payload_read_length_valid ( &test_read_data ), false );
 }
 
-fn is_payload_read_length_valid (payload: &Vec<u8>) -> bool 
+fn is_payload_read_length_valid ( payload: &Vec<u8> ) -> bool 
 {
 	return payload.len() >= MODBUS_READ_MINIMUM_PAYLOAD_LENGTH;
 }
@@ -1379,13 +1379,13 @@ fn is_payload_read_length_valid (payload: &Vec<u8>) -> bool
 fn test_is_payload_write_length_valid ()
 {
 	let test_write_data : Vec< u8 > = vec![ 0x00, 0x01, 0xFF, 0x00 ];
-	assert!(is_payload_read_length_valid(&test_write_data));
+	assert!( is_payload_read_length_valid ( &test_write_data ) );
 
 	let test_write_data : Vec< u8 > = vec![ 0x00, 0x01 ];
-	assert_eq!(is_payload_read_length_valid(&test_write_data), false);	
+	assert_eq!( is_payload_read_length_valid ( &test_write_data ), false );	
 }
 
-fn is_payload_write_length_valid (payload: &Vec<u8>) -> bool 
+fn is_payload_write_length_valid ( payload: &Vec<u8> ) -> bool 
 {
 	return payload.len () == MODBUS_WRITE_MINIMUM_PAYLOAD_LENGTH;
 }
