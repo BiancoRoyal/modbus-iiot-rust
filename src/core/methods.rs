@@ -1042,7 +1042,7 @@ pub fn prepare_response_read_coils ( payload : &Vec< u8 >, coil_count : u16 ) ->
 {
 	let mut reply : Vec< bool > = vec![];
 
-	if is_payload_read_length_valid (&payload)
+	if is_payload_read_coil_length_valid (&payload)
 	{
 		if let Some( byte_count ) = extract_byte_from_bytearray ( &payload, 
 							 									  0 )
@@ -1113,7 +1113,7 @@ pub fn prepare_response_read_discrete_inputs ( payload : &Vec< u8 >, input_count
 {
 	let mut reply : Vec< bool > = vec![];
 
-	if is_payload_read_length_valid (&payload)
+	if is_payload_read_coil_length_valid (&payload)
 	{
 		if let Some( byte_count ) = extract_byte_from_bytearray ( &payload, 
 																  0 )
@@ -1164,7 +1164,7 @@ pub fn prepare_response_read_holding_registers ( payload : &Vec< u8 > ) -> Vec< 
 {
 	let mut reply : Vec< u16 > = vec![];
 
-	if is_payload_read_length_valid (&payload)
+	if is_payload_read_register_length_valid (&payload)
 	{
 		if let Some( byte_count ) = extract_byte_from_bytearray ( &payload, 
 																  0 )
@@ -1202,7 +1202,7 @@ pub fn prepare_response_read_input_registers ( payload : &Vec< u8 > ) -> Vec< u1
 {
 	let mut reply : Vec< u16 > = vec![];
 
-	if is_payload_read_length_valid (&payload)
+	if is_payload_read_register_length_valid (&payload)
 	{
 		if let Some( byte_count ) = extract_byte_from_bytearray ( &payload, 
 																  0 )
@@ -1360,18 +1360,34 @@ pub fn prepare_response_write_single_register ( payload : &Vec< u8 > ) -> Vec< u
 
 //	===============================================================================================
 #[test]
-fn test_is_payload_read_length_valid ()
+fn test_is_payload_read_coil_length_valid ()
 {
-	let test_read_data : Vec< u8 > = vec![ 0x03, 0xAC, 0xDB, 0x35 ];
-	assert!( is_payload_read_length_valid ( &test_read_data ) );
+	let test_read_data : Vec< u8 > = vec![ 0x03, 0xAC];
+	assert!( is_payload_read_coil_length_valid ( &test_read_data ) );
 
-	let test_read_data : Vec< u8 > = vec![ 0x03, 0xAC ];
-	assert_eq!( is_payload_read_length_valid ( &test_read_data ), false );
+	let test_read_data : Vec< u8 > = vec![ 0x03 ];
+	assert_eq!( is_payload_read_coil_length_valid ( &test_read_data ), false );
 }
 
-fn is_payload_read_length_valid ( payload: &Vec<u8> ) -> bool 
+fn is_payload_read_coil_length_valid ( payload: &Vec<u8> ) -> bool 
 {
-	return payload.len() >= MODBUS_READ_MINIMUM_PAYLOAD_LENGTH;
+	return payload.len() >= MODBUS_READ_COIL_MINIMUM_PAYLOAD_LENGTH;
+}
+
+//	===============================================================================================
+#[test]
+fn test_is_payload_read_register_length_valid ()
+{
+	let test_read_data : Vec< u8 > = vec![ 0x03, 0xAC, 0xDB, 0x35 ];
+	assert!( is_payload_read_register_length_valid ( &test_read_data ) );
+
+	let test_read_data : Vec< u8 > = vec![ 0x03, 0xAC ];
+	assert_eq!( is_payload_read_register_length_valid ( &test_read_data ), false );
+}
+
+fn is_payload_read_register_length_valid ( payload: &Vec<u8> ) -> bool 
+{
+	return payload.len() >= MODBUS_READ_REGISTER_MINIMUM_PAYLOAD_LENGTH;
 }
 
 //	===============================================================================================
@@ -1379,10 +1395,10 @@ fn is_payload_read_length_valid ( payload: &Vec<u8> ) -> bool
 fn test_is_payload_write_length_valid ()
 {
 	let test_write_data : Vec< u8 > = vec![ 0x00, 0x01, 0xFF, 0x00 ];
-	assert!( is_payload_read_length_valid ( &test_write_data ) );
+	assert!( is_payload_write_length_valid ( &test_write_data ) );
 
 	let test_write_data : Vec< u8 > = vec![ 0x00, 0x01 ];
-	assert_eq!( is_payload_read_length_valid ( &test_write_data ), false );	
+	assert_eq!( is_payload_write_length_valid ( &test_write_data ), false );	
 }
 
 fn is_payload_write_length_valid ( payload: &Vec<u8> ) -> bool 
