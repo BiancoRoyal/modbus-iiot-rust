@@ -3,6 +3,7 @@
 use core::consts::*;
 use core::datatransformation::*;
 
+//	===============================================================================================
 
 pub struct ModbusTelegram
 {
