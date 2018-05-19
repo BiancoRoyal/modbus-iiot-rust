@@ -10,6 +10,7 @@ use core::modbustelegram::*;
 use core::modbusreturn::*;
 use core::methods::*;
 use core::timehandling::*;
+use tcp::masteraccess::*;
 use tcp::streamtelegram::*;
 
 //	===============================================================================================
@@ -561,4 +562,25 @@ fn process_response_of_registers ( response_data : Vec< u16 >, start_time : &Tim
 	}
 
 	return reply;
+}
+
+//	===============================================================================================
+
+impl MasterAccess for TcpClient
+{
+	fn write_single_coil ( &mut self, address : u16, value : CoilValue ) -> bool
+	{
+		let mut reply : bool = false;
+
+		let response : ModbusReturnCoils = EthernetMaster::write_single_coil ( self, 
+																			   address, 
+																			   convert_for_write_single_coil ( value ) );
+
+		if response.is_good ()
+		{
+			reply = true;
+		}
+
+		return reply;
+	}
 }
