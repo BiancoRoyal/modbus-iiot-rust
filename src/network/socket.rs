@@ -1,5 +1,6 @@
 
 
+use std::error::Error;
 use std::net::{AddrParseError, IpAddr, SocketAddr};
 use std::str::FromStr;
 
@@ -8,72 +9,75 @@ use std::str::FromStr;
 #[test]
 fn test_parse_network_address ()
 {
-    let result_1 : Option< SocketAddr > = parse_network_address ( "127.0.0.1", 
-                                                                  502 );
-    assert! ( result_1.is_some () );
+    let result_1 : Result< SocketAddr, String > = parse_network_address ( "127.0.0.1", 
+                                                                          502 );
+    assert! ( result_1.is_ok () );
 
-    let result_2 : Option< SocketAddr > = parse_network_address ( "127.0.0.1:504",
-                                                                  502 );
-    assert! ( result_2.is_some () );
+    let result_2 : Result< SocketAddr, String > = parse_network_address ( "127.0.0.1:504",
+                                                                          502 );
+    assert! ( result_2.is_ok () );
 
     let socket_1 : SocketAddr = result_2.unwrap ();
     assert! ( socket_1.is_ipv4 () );
     assert_eq! ( format! ( "{}", socket_1.ip () ), "127.0.0.1" );
     assert_eq! ( socket_1.port (), 504 );
 
-    let result_3 : Option< SocketAddr > = parse_network_address ( "127.0.300.1",
-                                                                  502 );
-    assert! ( result_3.is_none () );
+    let result_3 : Result< SocketAddr, String > = parse_network_address ( "127.0.300.1",
+                                                                          502 );
+    assert! ( result_3.is_err () );
 
-    let result_4 : Option< SocketAddr > = parse_network_address ( "::1", 
-                                                                  502 );
-    assert! ( result_4.is_some () );
+    let result_4 : Result< SocketAddr, String > = parse_network_address ( "::1", 
+                                                                          502 );
+    assert! ( result_4.is_ok () );
 
-    let result_5 : Option< SocketAddr > = parse_network_address ( "[::1]:504", 
-                                                                  502 );
-    assert! ( result_5.is_some () );
+    let result_5 : Result< SocketAddr, String > = parse_network_address ( "[::1]:504", 
+                                                                          502 );
+    assert! ( result_5.is_ok () );
 
     let socket_2 : SocketAddr = result_5.unwrap ();
     assert! ( socket_2.is_ipv6 () );
     assert_eq! ( format! ( "{}", socket_2.ip () ), "::1" );
     assert_eq! ( socket_2.port (), 504 );
 
-    let result_6 : Option< SocketAddr > = parse_network_address ( "::111111", 
-                                                                  502 );
-    assert! ( result_6.is_none () );
+    let result_6 : Result< SocketAddr, String > = parse_network_address ( "::111111", 
+                                                                          502 );
+    assert! ( result_6.is_err () );
 
-    let result_7 : Option< SocketAddr > = parse_network_address ( "127.0.0.1", 
-                                                                  0 );
-    assert! ( result_7.is_none () );
+    let result_7 : Result< SocketAddr, String > = parse_network_address ( "127.0.0.1", 
+                                                                          0 );
+    assert! ( result_7.is_err () );
 
-    let result_8 : Option< SocketAddr > = parse_network_address ( "", 
-                                                                  502 );
-    assert! ( result_8.is_none () );
+    let result_8 : Result< SocketAddr, String > = parse_network_address ( "", 
+                                                                          502 );
+    assert! ( result_8.is_err () );
 }
 
-pub fn parse_network_address ( address_string : &str, default_port : u16 ) -> Option< SocketAddr >
+pub fn parse_network_address ( address_string : &str, default_port : u16 ) -> Result< SocketAddr, String >
 {
-    let reply : Option< SocketAddr >;
+    let reply : Result< SocketAddr, String >;
 
     if address_string.is_empty () || default_port == 0x0000
     {
-        reply = None;
+        reply = Err( "address is empty or port is 0.".to_string () );
     }
     else
     {
-        if let Some( socket ) = parse_socket_address ( address_string )
+        if let Ok( socket ) = parse_socket_address ( address_string )
         {
-            reply = Some( socket );
+            reply = Ok( socket );
         }
         else
         {
-            if let Some( ip ) = parse_ip_address ( address_string )
+            let ip : Result< IpAddr, String > = parse_ip_address ( address_string );
+
+            if ip.is_ok ()
             {
-                reply = Some ( SocketAddr::new ( ip, default_port ) );
+                reply = Ok( SocketAddr::new ( ip.unwrap (),
+                                              default_port ) );
             }
             else
             {
-                reply = None;
+                reply = Err( ip.unwrap_err () );
             }
         }
     }
@@ -86,37 +90,37 @@ pub fn parse_network_address ( address_string : &str, default_port : u16 ) -> Op
 #[test]
 fn test_parse_ip_address ()
 {
-    let result_1 : Option< IpAddr > = parse_ip_address ( "127.0.0.1" );
-    assert! ( result_1.is_some () );
+    let result_1 : Result< IpAddr, String > = parse_ip_address ( "127.0.0.1" );
+    assert! ( result_1.is_ok () );
 
     let ip_1 : IpAddr = result_1.unwrap ();
     assert! ( ip_1.is_ipv4 () );
     assert_eq! ( format!("{}", ip_1 ), "127.0.0.1" );
 
-    let result_2 : Option< IpAddr > = parse_ip_address ( "127.0.0.1111" );
-    assert! ( result_2.is_none () );
+    let result_2 : Result< IpAddr, String > = parse_ip_address ( "127.0.0.1111" );
+    assert! ( result_2.is_err () );
 
-    let result_3 : Option< IpAddr > = parse_ip_address ( "::1" );
-    assert! ( result_3.is_some () );
+    let result_3 : Result< IpAddr, String > = parse_ip_address ( "::1" );
+    assert! ( result_3.is_ok () );
 
     let ip_2 : IpAddr = result_3.unwrap ();
     assert! ( ip_2.is_ipv6 () );
     assert_eq! ( format! ( "{}", ip_2 ), "::1" );
 
-    let result_4 : Option< IpAddr > = parse_ip_address ( "::111111" );
-    assert! ( result_4.is_none () );
+    let result_4 : Result< IpAddr, String > = parse_ip_address ( "::111111" );
+    assert! ( result_4.is_err () );
 
-    let result_5 : Option< IpAddr > = parse_ip_address ( "" );
-    assert! ( result_5.is_none () );
+    let result_5 : Result< IpAddr, String > = parse_ip_address ( "" );
+    assert! ( result_5.is_err () );
 }
 
-fn parse_ip_address ( address_string : &str ) -> Option< IpAddr >
+fn parse_ip_address ( address_string : &str ) -> Result< IpAddr, String >
 {
-    let reply : Option< IpAddr >;
+    let reply : Result< IpAddr, String >;
 
     if address_string.is_empty ()
     {
-        reply = None;
+        reply = Err( "address is empty.".to_string () );
     }
     else
     {
@@ -124,11 +128,11 @@ fn parse_ip_address ( address_string : &str ) -> Option< IpAddr >
 
         if result.is_ok ()
         {
-            reply = Some( result.unwrap () );
+            reply = Ok( result.unwrap () );
         }
         else
         {
-            reply = None;
+            reply = Err( result.unwrap_err ().description ().to_owned () );
         }
     }
 
@@ -140,45 +144,45 @@ fn parse_ip_address ( address_string : &str ) -> Option< IpAddr >
 #[test]
 fn test_parse_socket_address ()
 {
-    let result_1 : Option< SocketAddr > = parse_socket_address ( "127.0.0.1:502" );
-    assert! ( result_1.is_some () );
+    let result_1 : Result< SocketAddr, String > = parse_socket_address ( "127.0.0.1:502" );
+    assert! ( result_1.is_ok () );
     
     let socket_1 : SocketAddr = result_1.unwrap ();
     assert! ( socket_1.is_ipv4 () );
     assert_eq! ( format! ( "{}", socket_1.ip () ), "127.0.0.1" );
     assert_eq! ( socket_1.port (), 502 );
 
-    let result_2 : Option< SocketAddr > = parse_socket_address ( "127.0.0.1111:502" );
-    assert! ( result_2.is_none () );
+    let result_2 : Result< SocketAddr, String > = parse_socket_address ( "127.0.0.1111:502" );
+    assert! ( result_2.is_err () );
 
-    let result_3 : Option< SocketAddr > = parse_socket_address ( "127.0.0.1" );
-    assert! ( result_3.is_none () );
+    let result_3 : Result< SocketAddr, String > = parse_socket_address ( "127.0.0.1" );
+    assert! ( result_3.is_err () );
 
-    let result_4 : Option< SocketAddr > = parse_socket_address ( "[::1]:502" );
-    assert! ( result_4.is_some () );
+    let result_4 : Result< SocketAddr, String > = parse_socket_address ( "[::1]:502" );
+    assert! ( result_4.is_ok () );
 
     let socket_2 : SocketAddr = result_4.unwrap ();
     assert! ( socket_2.is_ipv6 () );
     assert_eq! ( format! ( "{}", socket_2.ip () ), "::1" );
     assert_eq! ( socket_2.port (), 502 );
 
-    let result_5 : Option< SocketAddr > = parse_socket_address ( "[::111111]:502" );
-    assert! ( result_5.is_none () );
+    let result_5 : Result< SocketAddr, String > = parse_socket_address ( "[::111111]:502" );
+    assert! ( result_5.is_err () );
 
-    let result_6 : Option< SocketAddr > = parse_socket_address ( "[::1]" );
-    assert! ( result_6.is_none () );
+    let result_6 : Result< SocketAddr, String > = parse_socket_address ( "[::1]" );
+    assert! ( result_6.is_err () );
 
-    let result_7 : Option< SocketAddr > = parse_socket_address ( "" );
-    assert! ( result_7.is_none () );
+    let result_7 : Result< SocketAddr, String > = parse_socket_address ( "" );
+    assert! ( result_7.is_err () );
 }
 
-fn parse_socket_address ( address_string : &str ) -> Option< SocketAddr >
+fn parse_socket_address ( address_string : &str ) -> Result< SocketAddr, String >
 {
-    let reply : Option< SocketAddr >;
+    let reply : Result< SocketAddr, String >;
 
     if address_string.is_empty ()
     {
-        reply = None;
+        reply = Err( "address is empty.".to_string () );
     }
     else
     {
@@ -186,11 +190,11 @@ fn parse_socket_address ( address_string : &str ) -> Option< SocketAddr >
 
         if result.is_ok ()
         {
-            reply = Some( result.unwrap () );
+            reply = Ok( result.unwrap () );
         }
         else
         {
-            reply = None;
+            reply = Err( result.unwrap_err ().description ().to_owned () );
         }
     }
 

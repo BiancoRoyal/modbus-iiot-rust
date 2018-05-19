@@ -50,13 +50,17 @@ impl TcpClient
 		};
 	}
 
-	pub fn connect ( &mut self ) -> bool
+	pub fn connect ( &mut self ) -> Result< bool, String >
 	{
-		let reply : bool;
+		let reply : Result< bool, String >;
 
-		if let Some( connection ) = create_tcp_stream ( &self.address, 
-														self.port )
+		let connection_result : Result< TcpStream, String > = create_tcp_stream ( &self.address, 
+																				  self.port );
+
+		if connection_result.is_ok ()
 		{
+			let connection : TcpStream = connection_result.unwrap ();
+
 			let timeout : Duration = Duration::from_millis ( 500 );
 
 			let _ = connection.set_read_timeout ( Some( timeout ) );
@@ -65,11 +69,11 @@ impl TcpClient
 
 			self.stream = Some( connection );
 
-			reply = true;
+			reply = Ok( true );
 		}
 		else
 		{
-			reply = false;
+			reply = Err( connection_result.unwrap_err () );
 		}
 
 		return reply;

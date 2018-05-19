@@ -1,29 +1,34 @@
 
 
-use std::net::TcpStream;
+use std::error::Error;
+use std::io;
+use std::net::{SocketAddr, TcpStream};
 use network::socket::parse_network_address;
 
 //	===============================================================================================
 
-pub fn create_tcp_stream ( ip_address : &str, port : u16 ) -> Option< TcpStream >
+pub fn create_tcp_stream ( ip_address : &str, port : u16 ) -> Result< TcpStream, String >
 {	
-	let reply : Option< TcpStream >;
+	let reply : Result< TcpStream, String >;
 
-	if let Some( socket_address ) = parse_network_address ( ip_address, 
-															port )
+	let address_result : Result< SocketAddr, String > = parse_network_address ( ip_address, 
+																				port );
+
+	if address_result.is_ok ()
 	{
-		if let Ok( stream ) = TcpStream::connect ( socket_address )
+		let connection_result : io::Result< TcpStream > = TcpStream::connect ( address_result.unwrap () );
+		if connection_result.is_ok ()
 		{
-			reply = Some( stream );
+			reply = Ok( connection_result.unwrap () );
 		}
 		else
-		{
-			reply = None;
+		{			
+			reply = Err( connection_result.unwrap_err ().description ().to_owned () );
 		}
 	}
 	else
 	{
-		reply = None;
+		reply = Err( address_result.unwrap_err () );
 	}
 
 	return reply;		
