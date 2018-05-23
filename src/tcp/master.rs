@@ -568,13 +568,93 @@ fn process_response_of_registers ( response_data : Vec< u16 >, start_time : &Tim
 
 impl MasterAccess for TcpClient
 {
+	fn read_coils ( &mut self, address : u16, quantity : u16 ) -> Vec< CoilValue >
+	{
+		let reply : Vec< CoilValue >;
+
+		let response : ModbusReturnCoils = EthernetMaster::read_coils ( self, 
+																		address, 
+																		quantity );
+
+		if response.is_good ()
+		{
+			reply = transform_modbus_return_coils ( response );
+		}
+		else
+		{
+			reply = vec![];
+		}
+
+		return reply;
+	}
+
+	fn read_discrete_inputs ( &mut self, address : u16, quantity : u16 ) -> Vec< CoilValue >
+	{
+		let reply : Vec< CoilValue >;
+
+		let response : ModbusReturnCoils = EthernetMaster::read_discrete_inputs ( self, 
+																			   	  address, 
+																			      quantity );
+
+		if response.is_good ()
+		{
+			reply = transform_modbus_return_coils ( response );
+		}
+		else
+		{
+			reply = vec![];
+		}
+
+		return reply;
+	}
+
+	fn read_holding_registers ( &mut self, address : u16, quantity : u16 ) -> Vec< u16 >
+	{
+		let reply : Vec< u16 >;
+
+		let response : ModbusReturnRegisters = EthernetMaster::read_holding_registers ( self,
+																						address,
+																						quantity );
+
+		if response.is_good ()
+		{
+			reply = transform_modbus_return_registers ( response );
+		}
+		else
+		{
+			reply = vec![];
+		}
+
+		return reply;
+	}
+
+	fn read_input_registers ( &mut self, address : u16, quantity : u16 ) -> Vec< u16 >
+	{
+		let reply : Vec< u16 >;
+
+		let response : ModbusReturnRegisters = EthernetMaster::read_input_registers ( self,
+																					  address,
+																					  quantity );
+
+		if response.is_good ()
+		{
+			reply = transform_modbus_return_registers ( response );
+		}
+		else
+		{
+			reply = vec![];
+		}
+
+		return reply;
+	}
+
 	fn write_single_coil ( &mut self, address : u16, value : CoilValue ) -> bool
 	{
 		let mut reply : bool = false;
 
 		let response : ModbusReturnCoils = EthernetMaster::write_single_coil ( self, 
 																			   address, 
-																			   convert_for_write_single_coil ( value ) );
+																			   convert_for_write_single_coil ( &value ) );
 
 		if response.is_good ()
 		{
@@ -583,4 +663,73 @@ impl MasterAccess for TcpClient
 
 		return reply;
 	}
+
+	fn write_single_register ( &mut self, address : u16, value : u16 ) -> bool
+	{
+		let response : ModbusReturnRegisters = EthernetMaster::write_single_register ( self,
+																					   address,
+																					   value );
+
+		return response.is_good ();
+	}
+
+	fn write_multiple_coils ( &mut self, address : u16, coils : Vec< CoilValue > ) -> bool
+	{
+		let mut reply : bool = false;
+
+		if coils.len () > 0
+		{
+			let values : Vec< u8 > = transform_coils_to_bytearray ( &coils );
+			let response : ModbusReturnRegisters = EthernetMaster::write_multiple_coils ( self, 
+																						  address, 
+																			   			  coils.len () as u16,
+																						  values );
+
+			reply = response.is_good ();
+		}
+
+		return reply;
+	}	
+
+	fn write_multiple_registers ( &mut self, address : u16, values : Vec< u16 > ) -> bool
+	{
+		let response : ModbusReturnRegisters = EthernetMaster::write_multiple_registers ( self,
+																						  address,
+																						  values );
+
+		return response.is_good ();
+	}
+}
+
+//	===============================================================================================
+
+fn transform_modbus_return_coils ( returned_coils : ModbusReturnCoils ) -> Vec< CoilValue >
+{
+	let mut reply : Vec< CoilValue > = vec![];
+
+	if returned_coils.is_good ()
+	{
+		let values : Vec< bool > = returned_coils.unwrap_good ().get_data ();
+
+		for coil in values
+		{
+			reply.push ( CoilValue::set ( coil ) );
+		}
+	}
+
+	return reply;
+}
+
+//	===============================================================================================
+
+fn transform_modbus_return_registers ( returned_registers : ModbusReturnRegisters ) -> Vec< u16 >
+{
+	let mut reply : Vec< u16 > = vec![];
+
+	if returned_registers.is_good ()
+	{
+		reply = returned_registers.unwrap_good ().get_data ();
+	}
+
+	return reply;
 }
