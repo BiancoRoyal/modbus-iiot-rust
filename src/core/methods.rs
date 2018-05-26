@@ -930,7 +930,7 @@ fn test_prepare_payload_write_multiple_registers ()
 
 fn prepare_payload_write_multiple_registers ( starting_address : u16, register_values : &Vec< u16 > ) -> Vec< u8 >
 {
-	let mut reply : Vec<u8> = vec![];
+	let mut reply : Vec< u8 > = vec![];
 	
 	append_word_to_bytearray ( &mut reply, 
 							   starting_address );
@@ -1239,7 +1239,7 @@ pub fn prepare_response_write_multiple_coils ( payload : &Vec< u8 > ) -> Vec< u1
 {
 	let mut reply : Vec< u16 > = vec![];
 
-	if is_payload_write_length_valid (&payload)
+	if is_payload_write_length_valid ( &payload )
 	{
 		reply = transform_bytes_to_words ( &payload, 
 										   0,
@@ -1266,7 +1266,7 @@ pub fn prepare_response_write_multiple_registers ( payload : &Vec< u8 > ) -> Vec
 {
 	let mut reply : Vec< u16 > = vec![];
 
-	if is_payload_write_length_valid (&payload)
+	if is_payload_write_length_valid ( &payload )
 	{
 		let option_address : Option< u16 > = extract_word_from_bytearray ( payload, 
 																		   0 );
@@ -1312,7 +1312,7 @@ pub fn prepare_response_write_single_coil ( payload : &Vec< u8 > ) -> Vec< bool 
 {
 	let mut reply : Vec< bool > = vec![];
 
-	if is_payload_write_length_valid (&payload)
+	if is_payload_write_length_valid ( &payload )
 	{
 		if let Some( word ) = extract_word_from_bytearray ( payload, 
 															2 )
@@ -1348,7 +1348,7 @@ pub fn prepare_response_write_single_register ( payload : &Vec< u8 > ) -> Vec< u
 {
 	let mut reply : Vec< u16 > = vec![];
 
-	if is_payload_write_length_valid (&payload)
+	if is_payload_write_length_valid ( &payload )
 	{
 		reply = transform_bytes_to_words ( &payload, 
 										   0,
@@ -1369,9 +1369,9 @@ fn test_is_payload_read_coil_length_valid ()
 	assert_eq!( is_payload_read_coil_length_valid ( &test_read_data ), false );
 }
 
-fn is_payload_read_coil_length_valid ( payload: &Vec<u8> ) -> bool 
+fn is_payload_read_coil_length_valid ( payload: &Vec< u8 > ) -> bool 
 {
-	return payload.len() >= MODBUS_READ_COIL_MINIMUM_PAYLOAD_LENGTH;
+	return payload.len () >= MODBUS_READ_COIL_MINIMUM_PAYLOAD_LENGTH;
 }
 
 //	===============================================================================================
@@ -1385,9 +1385,9 @@ fn test_is_payload_read_register_length_valid ()
 	assert_eq!( is_payload_read_register_length_valid ( &test_read_data ), false );
 }
 
-fn is_payload_read_register_length_valid ( payload: &Vec<u8> ) -> bool 
+fn is_payload_read_register_length_valid ( payload: &Vec< u8 > ) -> bool 
 {
-	return payload.len() >= MODBUS_READ_REGISTER_MINIMUM_PAYLOAD_LENGTH;
+	return payload.len () >= MODBUS_READ_REGISTER_MINIMUM_PAYLOAD_LENGTH;
 }
 
 //	===============================================================================================
@@ -1401,7 +1401,7 @@ fn test_is_payload_write_length_valid ()
 	assert_eq!( is_payload_write_length_valid ( &test_write_data ), false );	
 }
 
-fn is_payload_write_length_valid ( payload: &Vec<u8> ) -> bool 
+fn is_payload_write_length_valid ( payload: &Vec< u8 > ) -> bool 
 {
 	return payload.len () == MODBUS_WRITE_MINIMUM_PAYLOAD_LENGTH;
 }

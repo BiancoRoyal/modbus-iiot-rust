@@ -26,12 +26,42 @@ pub struct TcpClient
 
 impl TcpClient
 {	
+	/// Creates a new `TcpClient` with the IPv4 or IPv6 address.
+	/// The default MODBUS TCP port 502 while be used.
+	/// 
+	/// # Example
+    /// 
+    /// ```rust,no_run
+	/// 
+	/// use modbus_iiot::tcp::master::TcpClient;;
+    /// 
+	/// //	with IPv4 address
+    /// let mut client = TcpClient::new("127.0.0.1");
+	/// //	or
+	/// //	with IPv6 address
+	/// let mut client = TcpClient::new("::1");
+	/// ```
 	pub fn new ( address : &str ) -> TcpClient
 	{		
 		return Self::new_with_port ( address, 
 									 MODBUS_TCP_PORT );		
 	}
 	
+	/// Creates a new `TcpClient` with the IPv4 or IPv6 address
+	/// and the specified TCP port.
+	/// 
+	/// # Example
+    /// 
+    /// ```rust,no_run
+	/// 
+	/// use modbus_iiot::tcp::master::TcpClient;;
+    /// 
+	/// //	with IPv4 address
+    /// let mut client = TcpClient::new_with_port("127.0.0.1", 504);
+	/// //	or
+	/// //	with IPv6 address
+	/// let mut client = TcpClient::new_with_port("::1", 511);
+	/// ```
 	pub fn new_with_port ( address : &str, port : u16 ) -> TcpClient
 	{		
 		return Self::new_with_port_and_unitid ( address, 
@@ -39,6 +69,21 @@ impl TcpClient
 												MODBUS_DEFAULT_UNIT_IDENTIFIER );		
 	}
 	
+	/// Creates a new `TcpClient` with the IPv4 or IPv6 address
+	/// the specified TCP port and the unit id of the device.
+	/// 
+	/// # Example
+    /// 
+    /// ```rust,no_run
+	/// 
+	/// use modbus_iiot::tcp::master::TcpClient;;
+    /// 
+	/// //	with IPv4 address
+    /// let mut client = TcpClient::new_with_port_and_unitid("127.0.0.1", 504, 42);
+	/// //	or
+	/// //	with IPv6 address
+	/// let mut client = TcpClient::new_with_port_and_unitid("::1", 511, 42);
+	/// ```
 	pub fn new_with_port_and_unitid ( address : &str, port : u16, unit_id : u8 ) -> TcpClient
 	{
 		return TcpClient
@@ -51,9 +96,30 @@ impl TcpClient
 		};
 	}
 
-	pub fn connect ( &mut self ) -> Result< bool, String >
+	///	Opens the connection to the device.
+	/// If the connection is open the `Result` is Ok
+	/// otherwise Err. Err than contais an error message.
+	/// 
+	/// # Example
+    /// 
+    /// ```rust,no_run
+	/// 
+	/// use modbus_iiot::tcp::master::TcpClient;;
+    /// 
+    /// let mut client = TcpClient::new("127.0.0.1");
+	/// 
+	/// if let Err(message) = client.connect()
+    /// {
+    ///     println!("failure = {}", message);
+    /// }
+    /// else
+    /// {
+    ///     client.disconnect();    
+    /// }
+	/// ```
+	pub fn connect ( &mut self ) -> Result< (), String >
 	{
-		let reply : Result< bool, String >;
+		let reply : Result< (), String >;
 
 		let connection_result : Result< TcpStream, String > = create_tcp_stream ( &self.address, 
 																				  self.port );
@@ -70,7 +136,7 @@ impl TcpClient
 
 			self.stream = Some( connection );
 
-			reply = Ok( true );
+			reply = Ok( () );
 		}
 		else
 		{
@@ -80,6 +146,7 @@ impl TcpClient
 		return reply;
 	}
 
+	///	Close the connection to the device if it is open.
 	pub fn disconnect ( &mut self ) -> bool
 	{	
 		let mut reply : bool = false;	
@@ -703,6 +770,21 @@ impl MasterAccess for TcpClient
 
 //	===============================================================================================
 
+#[test]
+fn test_transform_modbus_return_coils ()
+{
+	let result_1 : Vec< CoilValue > = transform_modbus_return_coils ( ModbusReturnCoils::None );
+	assert_eq! ( result_1.len (), 0 );
+
+	let test_data_1 : ReturnBad = ReturnBad::new_with_message ( "some error message" );
+	let result_2 : Vec< CoilValue > = transform_modbus_return_coils ( ModbusReturnCoils::Bad ( test_data_1 ) );
+	assert_eq! ( result_2.len (), 0 );
+
+	let test_data_2 : ReturnGood< bool > = ReturnGood::new ( vec![ true, true, false, false, true, true, false, true ], 1 );
+	let result_3 : Vec< CoilValue > = transform_modbus_return_coils ( ModbusReturnCoils::Good ( test_data_2 ) );
+	assert_eq! ( result_3.len (), 8 );
+}
+
 fn transform_modbus_return_coils ( returned_coils : ModbusReturnCoils ) -> Vec< CoilValue >
 {
 	let mut reply : Vec< CoilValue > = vec![];
@@ -721,6 +803,21 @@ fn transform_modbus_return_coils ( returned_coils : ModbusReturnCoils ) -> Vec< 
 }
 
 //	===============================================================================================
+
+#[test]
+fn test_transform_modbus_return_registers ()
+{
+	let result_1 : Vec< u16 > = transform_modbus_return_registers ( ModbusReturnRegisters::None );
+	assert_eq! ( result_1.len (), 0 );
+
+	let test_data_1 : ReturnBad = ReturnBad::new_with_message ( "some error message" );
+	let result_2 : Vec< u16 > = transform_modbus_return_registers ( ModbusReturnRegisters::Bad ( test_data_1 ) );
+	assert_eq! ( result_2.len (), 0 );
+	
+	let test_data_2 : ReturnGood< u16 > = ReturnGood::new ( vec![ 123, 456, 789 ], 1 );
+	let result_3 : Vec< u16 > = transform_modbus_return_registers ( ModbusReturnRegisters::Good ( test_data_2 ) );
+	assert_eq! ( result_3.len (), 3 );
+}
 
 fn transform_modbus_return_registers ( returned_registers : ModbusReturnRegisters ) -> Vec< u16 >
 {
