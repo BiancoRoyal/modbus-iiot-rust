@@ -1,3 +1,4 @@
+sudo: required
 language: rust
 matrix:
   include:
@@ -14,7 +15,7 @@ addons:
       - libudev-dev 
       - libcurl4-openssl-dev 
       - libelf-dev 
-      - libdw-dev 
+      - libdw-dev
       - binutils-dev 
       - cmake 
     sources: 
@@ -27,6 +28,7 @@ before_script:
 script:
   - cargo build --verbose --all
   - cargo test --verbose --all
+  - cargo doc
 after_success:
   - cargo coveralls
 branches:
