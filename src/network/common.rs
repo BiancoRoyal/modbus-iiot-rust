@@ -1,30 +1,35 @@
 
 
-use std::io::Result;
-use std::net::{Ipv4Addr, SocketAddrV4, TcpStream};
+use std::error::Error;
+use std::io;
+use std::net::{SocketAddr, TcpStream};
+use network::socket::parse_network_address;
 
-use super::socket::to_socket_address_v4;
+//	===============================================================================================
 
-
-pub fn create_tcp_stream_v4 ( host : &str, port : u16 ) -> Option < TcpStream >
+pub fn create_tcp_stream ( ip_address : &str, port : u16 ) -> Result< TcpStream, String >
 {	
-	let mut l_return : Option<TcpStream> = None;
+	let reply : Result< TcpStream, String >;
 
-	let l_address : Option<Ipv4Addr> = to_socket_address_v4 ( &host );
-	
-	if l_address.is_some ( )
+	let address_result : Result< SocketAddr, String > = parse_network_address ( ip_address, 
+																				port );
+
+	if address_result.is_ok ()
 	{
-		let ip : Ipv4Addr = l_address.unwrap ( );
-		
-		let socket : SocketAddrV4 = SocketAddrV4::new ( ip, port );
-		
-		let l_connection_result : Result<TcpStream> = TcpStream::connect ( socket );
-
-		if l_connection_result.is_ok()
+		let connection_result : io::Result< TcpStream > = TcpStream::connect ( address_result.unwrap () );
+		if connection_result.is_ok ()
 		{
-			l_return = Some ( l_connection_result.unwrap ( ) );
+			reply = Ok( connection_result.unwrap () );
 		}
-	}		
+		else
+		{			
+			reply = Err( connection_result.unwrap_err ().description ().to_owned () );
+		}
+	}
+	else
+	{
+		reply = Err( address_result.unwrap_err () );
+	}
 
-	return l_return;		
+	return reply;		
 }

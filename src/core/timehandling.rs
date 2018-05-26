@@ -1,19 +1,46 @@
 
 
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 
+//	===============================================================================================
+
+pub struct Timestamp
+{
+    time : SystemTime
+}
+
+impl Timestamp
+{
+    pub fn new () -> Timestamp
+    {
+        return Timestamp { time : SystemTime::now () };
+    }
+
+    pub fn elapsed_milliseconds ( &self ) -> u64
+    {
+        let elapsed_time : Duration = self.time.elapsed ().unwrap ();
+        return compute_milliseconds ( &elapsed_time );
+    }
+
+    pub fn elapsed_time ( &self ) -> Duration
+    {
+        return self.time.elapsed ().unwrap ();
+    }
+}
+
+//	===============================================================================================
 
 #[test]
 fn test_compute_milliseconds ( )
 {
-    let l_test_1_data : Duration = Duration::new ( 0, 2000000 );
+    let test_data : Duration = Duration::new ( 0, 
+                                               2000000 );
 
-    let l_result_1_data = compute_milliseconds ( &l_test_1_data );
-
-    assert_eq! ( l_result_1_data, 2 );
+    let result_data = compute_milliseconds ( &test_data );
+    assert_eq! ( result_data, 2 );
 }
 
-pub fn compute_milliseconds ( duration : &Duration ) -> u64
+fn compute_milliseconds ( duration : &Duration ) -> u64
 {
-    return ( duration.as_secs ( ) * 1000 ) + ( ( duration.subsec_nanos ( ) / 1000000 ) as u64 );
+    return ( duration.as_secs () * 1000 ) + ( ( duration.subsec_nanos () / 1000000 ) as u64 );
 }
