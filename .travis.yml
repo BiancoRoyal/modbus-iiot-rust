@@ -8,8 +8,23 @@ matrix:
     - rust: nightly
   fast_finish: true
 cache: cargo
+addons: 
+  apt: 
+    packages: 
+      - libudev-dev 
+      - libcurl4-openssl-dev 
+      - libelf-dev 
+      - libdw-dev 
+      - binutils-dev 
+      - cmake 
+    sources: 
+      - kalakris-cmake 
+before_script:      
+  - export PATH=$HOME/.cargo/bin:$PATH
+  - cargo install cargo-update || echo "cargo-update already installed"
+  - cargo install cargo-travis || echo "cargo-travis already installed"
+  - cargo install-update -a # update outdated cached binaries
 script:
-  - cargo install coveralls
   - cargo build --verbose --all
   - cargo test --verbose --all
 after_success:
