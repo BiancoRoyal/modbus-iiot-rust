@@ -1,5 +1,3 @@
-
-
 pub mod consts;
 pub mod datatransformation;
 pub mod ethernet;
